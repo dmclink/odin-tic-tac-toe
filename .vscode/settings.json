@@ -1,0 +1,27 @@
+{
+    "[javascript]": {
+        "editor.tabSize": 2,
+        "prettier.tabWidth": 2,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
+    "prettier.useTabs": true,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit",
+        "source.fixAll": "explicit"
+    },
+    "eslint.codeActionsOnSave.rules": [ 
+        "!prefer-const",
+        "*"
+    ],
+    "eslint.validate": ["javascript"],
+    "eslint.rules.customizations": [
+        {"rule": "*", "severity": "warn"},
+        {"rule": "no-const-assign", "severity": "error"},
+        {"rule": "no-use-before-define", "severity": "error"},
+        {"rule": "no-eval", "severity": "error"},
+        {"rule": "no-undef", "severity": "error"},
+        {"rule": "no-redeclare", "severity": "error"},
+        {"rule": "import/first", "severity": "error"},
+    ]
+}
