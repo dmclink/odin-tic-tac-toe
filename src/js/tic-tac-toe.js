@@ -1,3 +1,33 @@
+const events = (function events() {
+	const e = {};
+
+	function on(eventName, fn) {
+		e[eventName] = e[eventName] || [];
+		e[eventName].push(fn);
+	}
+
+	function off(eventName, fn) {
+		if (e[eventName]) {
+			for (let i = 0; i < e[eventName].length; i++) {
+				if (e[eventName] === fn) {
+					e[eventName].splice(i, 1);
+					break;
+				}
+			}
+		}
+	}
+
+	function emit(eventName, data) {
+		if (e[eventName]) {
+			e[eventName].forEach((fn) => {
+				fn(data);
+			});
+		}
+	}
+
+	return { on, off, emit };
+})();
+
 const game = (function tictactoe() {
 	// #region PRIVATE FIELDS
 	// // CONSTANTS
@@ -22,6 +52,8 @@ const game = (function tictactoe() {
 	// one of: 0, 1
 	// value of 0 means it is player 1's turn, 1 means player 2
 	let currentPlayer = 0;
+
+	let winner;
 	// #endregion
 
 	// #region PRIVATE METHODS
@@ -52,21 +84,13 @@ const game = (function tictactoe() {
 		currentPlayer ^= 1;
 	}
 
-	/** Prints board to console */
-	function render() {
-		console.log(board);
-	}
-
-	/** Checks if any winner of the game and returns it, otherwise returns undefined.
+	/** Updates winner state if game has a winner, otherwise leaves winner as undefined.
 	 * A game winner is if either player has placed 3 of their symbols in a row.
 	 * A game tie is if the board is filled and there is no winner.
 	 * Game is still ongoing (return undefined) if board is not filled and there is no winner.
 	 *
-	 * @returns {undefined|player1|player2|tie} - the winner of the game
 	 */
-	function checkWinner() {
-		let winner;
-
+	function updateWinner() {
 		const mapToPlayer = { X: player1, O: player2 };
 		// check rows
 		for (let i = 0; i < 3; i++) {
@@ -128,11 +152,10 @@ const game = (function tictactoe() {
 		if (isTie) {
 			winner = tie;
 		}
-
-		return winner;
 	}
 
 	function gameOver(winner) {
+		events.emit('gameOver', winner);
 		switch (winner) {
 			case player1:
 				console.log('Player 1 wins!');
@@ -146,34 +169,34 @@ const game = (function tictactoe() {
 		}
 		console.log("If you'd like to play again, call reset()");
 	}
+
+	function currentPlayerSymbol() {
+		return playerSymbol[currentPlayer];
+	}
 	// #endregion
 
 	// #region PUBLIC METHODS
+	function canPlace(row, col) {
+		if (oob(row, col)) {
+			return false;
+		}
+
+		if (!empty(row, col)) {
+			return false;
+		}
+
+		return true;
+	}
+
 	/** Places the game piece for the current player at the inputted board location.
-	 * Throws error if incorrect location inputed or if location is already filled.
-	 * Calls to re-render board, checks for winner, and toggle player after a valid placement.
+	 * ASSUME: row and col are valid locations (canPlace(row, col) called before this method)
 	 *
 	 * @param {number[0,2]} row - the row to place the game piece
 	 * @param {number[0,2]} col - the column to place the game place
 	 */
 	function place(row, col) {
-		if (oob(row, col)) {
-			throw Error('location out of bounds of board');
-		}
-
-		if (!empty(row, col)) {
-			throw Error('tried placing piece in already occupied location');
-		}
-
 		const currentPlayerSymbol = playerSymbol[currentPlayer];
 		board[row][col] = currentPlayerSymbol;
-		render();
-		const winner = checkWinner();
-		if (winner !== undefined) {
-			gameOver(winner);
-		} else {
-			toggleCurrentPlayer();
-		}
 	}
 
 	/** Resets game to initial state */
@@ -185,11 +208,81 @@ const game = (function tictactoe() {
 		}
 
 		currentPlayer = 0;
-		render();
+		winner = undefined;
+	}
+
+	function playRound(data) {
+		const { row, col } = data;
+		if (!canPlace(row, col)) {
+			throw Error(`invalid placement. row: ${row} col: ${col}`);
+		}
+
+		place(row, col);
+		updateWinner();
+		if (winner !== undefined) {
+			gameOver(winner);
+		} else {
+			toggleCurrentPlayer();
+		}
 	}
 	// #endregion
 
-	render();
+	// #region INIT
+	events.on('playRound', playRound);
 
-	return { place, reset };
+	// #endregion
+	return { place, reset, currentPlayerSymbol };
 })();
+
+const displayController = (function displayController() {
+	const board = document.querySelector('.board');
+	const cells = board.querySelectorAll('.cell');
+	const cols = board.querySelectorAll('.col');
+
+	// PRIVATE METHODS
+	function handleCellClick(e) {
+		const cell = e.target;
+		const row = Number(cell.getAttribute('data-row'));
+		const col = Number(cell.getAttribute('data-col'));
+
+		// TODO: see if we can get with a "changePlayer" emit
+		const symbol = game.currentPlayerSymbol();
+		events.emit('playRound', { row, col, symbol });
+	}
+
+	// PUBLIC METHODS
+	function bindEvents() {
+		cells.forEach((cell) => {
+			cell.addEventListener('click', handleCellClick);
+		});
+	}
+
+	// TODO: probably need to rebind events on restart
+	function unbindEvents() {
+		cells.forEach((cell) => {
+			cell.removeEventListener('click', handleCellClick);
+		});
+	}
+
+	function updateData(data) {
+		const { row, col, symbol } = data;
+		// TODO: cache this query selector into a 2d matrix
+		const cell = cols[col].querySelectorAll('.cell')[row];
+		cell.setAttribute('data-piece', symbol);
+	}
+
+	function displayWinner(winner) {
+		// TODO:
+		console.log('wooo the winner was:', winner);
+	}
+
+	events.on('playRound', updateData);
+	events.on('gameOver', unbindEvents);
+	events.on('gameOver', displayWinner);
+
+	return { updateData, bindEvents };
+})();
+
+document.addEventListener('DOMContentLoaded', () => {
+	displayController.bindEvents();
+});

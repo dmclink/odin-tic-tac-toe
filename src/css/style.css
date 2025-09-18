@@ -140,7 +140,6 @@ summary {
 	&[data-piece='.'] {
 		background-color: transparent;
 	}
-	/* TODO: change these to have a big X and O instead of bgc*/
 	&[data-piece='X'] {
 		position: relative;
 		&::after {
