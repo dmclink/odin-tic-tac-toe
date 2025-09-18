@@ -1,0 +1,164 @@
+/* #region || CSS RESET */
+*,
+*::before,
+*::after {
+	box-sizing: inherit;
+	line-height: calc(1em + 0.5rem);
+	padding: 0;
+	margin: 0;
+}
+
+html {
+	font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif,
+		'Apple Color Emoji', 'Segoe UI Emoji';
+	box-sizing: border-box;
+	-webkit-text-size-adjust: 100%;
+	tab-size: 4;
+}
+
+body {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+input,
+button,
+textarea,
+select {
+	font: inherit;
+	font-feature-settings: inherit;
+	font-variation-settings: inherit;
+	letter-spacing: inherit;
+	color: inherit;
+	border-radius: 0;
+	background-color: transparent;
+	opacity: 1;
+}
+
+button {
+	cursor: pointer;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+	display: block;
+	max-inline-size: 100%;
+	max-block-size: 100%;
+}
+
+ol,
+ul,
+menu {
+	list-style: none;
+	padding-inline: 0;
+}
+
+code,
+kbd,
+samp,
+pre {
+	font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', Menlo,
+		monospace;
+	font-size: 1em;
+}
+
+b,
+strong {
+	font-weight: bolder;
+}
+
+button,
+[type='button'],
+[type='reset'],
+[type='submit'] {
+	-webkit-appearance: button;
+}
+
+sub,
+sup {
+	font-size: 75%;
+	line-height: 0;
+	position: relative;
+	vertical-align: baseline;
+}
+sub {
+	bottom: -0.25em;
+}
+sup {
+	top: -0.5em;
+}
+
+table {
+	border-color: currentcolor;
+	border-collapse: collapse;
+}
+
+progress {
+	vertical-align: baseline;
+}
+
+::-webkit-inner-spin-button,
+::-webkit-outer-spin-button {
+	height: auto;
+}
+
+[type='search'] {
+	-webkit-appearance: textfield;
+	outline-offset: -2px;
+}
+
+::-webkit-search-decoration {
+	-webkit-appearance: none;
+}
+
+::-webkit-file-upload-button {
+	-webkit-appearance: button;
+	font: inherit;
+}
+
+summary {
+	display: list-item;
+}
+/* #endregion */
+
+.board {
+	border: 2px solid #000;
+	display: grid;
+	width: min-content;
+	grid-template-columns: repeat(3, 100px);
+}
+
+.cell {
+	display: block;
+	height: 100px;
+	width: 100%;
+	border: 1px solid #000;
+
+	&[data-piece='.'] {
+		background-color: transparent;
+	}
+	/* TODO: change these to have a big X and O instead of bgc*/
+	&[data-piece='X'] {
+		position: relative;
+		&::after {
+			content: 'X';
+			color: red;
+			inset: 0;
+			font-size: 70px;
+			font-weight: bold;
+		}
+	}
+	&[data-piece='O'] {
+		position: relative;
+		&::after {
+			content: 'O';
+			color: black;
+			inset: 0;
+			font-size: 70px;
+			font-weight: bold;
+		}
+	}
+}
