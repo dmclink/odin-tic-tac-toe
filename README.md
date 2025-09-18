@@ -1,15 +1,8 @@
-# js-eslint-prettier-template
+# odin-tic-tac-toe
 
-A template repo for new JavaScript projects in VSCode with ESLint and Prettier
-configured. Largely follows [AirBnb style guide](https://github.com/airbnb/javascript).
+Tic-tac-toe game built for the course The Odin Project
 
-## Setup Instructions
+# Skills Used
 
-1. Create new repo in GitHub from this template
-2. Clone repo to local dev environment
-3. Ensure node is installed on local
-4. To install dev depdendencies and update project name, run cmd:
-
-```bash
-node setup.js
-```
+- JavaScript DOM manipulation
+- CSS/HTML ui
