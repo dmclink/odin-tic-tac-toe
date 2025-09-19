@@ -226,8 +226,6 @@ const game = (function tictactoe() {
 
 		currentPlayer = 0;
 		winner = undefined;
-
-		events.emit('gameStart', currentPlayer);
 	}
 
 	function playRound(data) {
@@ -246,6 +244,7 @@ const game = (function tictactoe() {
 	// #region INIT
 	events.on('tryRound', tryRound);
 	events.on('playRound', playRound);
+	events.on('gameStart', reset);
 
 	// #endregion
 	return { place, reset };
@@ -332,4 +331,8 @@ const displayController = (function displayController() {
 
 document.addEventListener('DOMContentLoaded', () => {
 	events.emit('gameStart');
+
+	document.querySelector('#reset').addEventListener('click', () => {
+		events.emit('gameStart');
+	});
 });
