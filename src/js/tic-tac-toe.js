@@ -226,6 +226,8 @@ const game = (function tictactoe() {
 
 		currentPlayer = 0;
 		winner = undefined;
+
+		events.emit('gameStart', currentPlayer);
 	}
 
 	function playRound(data) {
@@ -239,22 +241,14 @@ const game = (function tictactoe() {
 			gameOver(winner);
 		}
 	}
-
-	/** Updates DOM element with string describing current player. */
-	function updatePlayer(currentPlayer) {
-		// TODO: update a DOM element with current playerString
-		const playerStrings = ["Player 1: X's", "Player 2: O's"];
-		console.log(playerStrings[currentPlayer]);
-	}
 	// #endregion
 
 	// #region INIT
 	events.on('tryRound', tryRound);
 	events.on('playRound', playRound);
-	events.on('playerChange', updatePlayer);
 
 	// #endregion
-	return { place, reset, currentPlayerSymbol };
+	return { place, reset };
 })();
 // #endergion
 
@@ -284,6 +278,33 @@ const displayController = (function displayController() {
 		events.emit('tryRound', { row, col });
 	}
 
+	function updateCellData(data) {
+		const { row, col, symbol } = data;
+		console.log('updating cell data:', row, col, symbol);
+
+		cells[row][col].setAttribute('data-piece', symbol);
+	}
+
+	function displayWinner(winner) {
+		// TODO: create a ui element in the html and update it here
+		console.log('wooo the winner was:', winner);
+	}
+
+	/** Updates DOM element with string describing current player. */
+	function updatePlayer(currentPlayer) {
+		// TODO: update a DOM element with current playerString
+		const playerStrings = ["Player 1: X's", "Player 2: O's"];
+		console.log(playerStrings[currentPlayer]);
+	}
+
+	function resetDisplay(currentPlayer) {
+		// TODO: reset all ui elements, cells data back to '.', update player turn
+		cellEls.forEach((cell) => {
+			cell.setAttribute('data-piece', '.');
+			updatePlayer(currentPlayer);
+		});
+	}
+
 	// PUBLIC METHODS
 	function bindEvents() {
 		cellEls.forEach((cell) => {
@@ -298,26 +319,17 @@ const displayController = (function displayController() {
 		});
 	}
 
-	function updateCellData(data) {
-		const { row, col, symbol } = data;
-		console.log('updating cell data:', row, col, symbol);
-
-		cells[row][col].setAttribute('data-piece', symbol);
-	}
-
-	function displayWinner(winner) {
-		// TODO: create a ui element in the html and update it here
-		console.log('wooo the winner was:', winner);
-	}
-
 	events.on('playRound', updateCellData);
+	events.on('playerChange', updatePlayer);
 	events.on('gameOver', unbindEvents);
 	events.on('gameOver', displayWinner);
+	events.on('gameStart', resetDisplay);
+	events.on('gameStart', bindEvents);
 
-	return { updateCellData, bindEvents };
+	return { bindEvents };
 })();
 // #endregion
 
 document.addEventListener('DOMContentLoaded', () => {
-	displayController.bindEvents();
+	events.emit('gameStart');
 });
