@@ -1,4 +1,4 @@
-/* #region || CSS RESET */
+/* #region || MARK: CSS RESET */
 *,
 *::before,
 *::after {
@@ -124,6 +124,12 @@ summary {
 }
 /* #endregion */
 
+/* MARK: VARIABLES */
+:root {
+	--line-width: 6px;
+	--offset-line-width: calc(var(--line-width) / 2);
+}
+
 .board {
 	border: 2px solid #000;
 	display: grid;
@@ -142,7 +148,7 @@ summary {
 	}
 	&[data-piece='X'] {
 		position: relative;
-		&::after {
+		&::before {
 			content: 'X';
 			color: red;
 			inset: 0;
@@ -152,7 +158,7 @@ summary {
 	}
 	&[data-piece='O'] {
 		position: relative;
-		&::after {
+		&::before {
 			content: 'O';
 			color: black;
 			inset: 0;
@@ -165,4 +171,36 @@ summary {
 /* STYLES */
 dialog {
 	margin: auto auto;
+}
+
+.line {
+	position: relative;
+	&::after {
+		display: block;
+		content: '';
+		position: absolute;
+		background-color: blue;
+		z-index: 1;
+		left: calc(50% - var(--offset-line-width));
+		width: var(--line-width);
+	}
+	&.horizontal::after {
+		top: 0;
+		bottom: 0;
+		transform: rotate(90deg);
+	}
+	&.vertical::after {
+		top: 0;
+		bottom: 0;
+	}
+	&.diagonal-up::after {
+		top: -23%;
+		bottom: -23%;
+		transform: rotate(45deg);
+	}
+	&.diagonal-down::after {
+		top: -23%;
+		bottom: -23%;
+		transform: rotate(-45deg);
+	}
 }

@@ -106,7 +106,14 @@ const game = (function tictactoe() {
 				board[i][0] === board[i][2]
 			) {
 				winner = mapToPlayer[board[i][0]];
-				break;
+				return {
+					line: 'h',
+					winningCells: [
+						[i, 0],
+						[i, 1],
+						[i, 2],
+					],
+				};
 			}
 		}
 
@@ -119,7 +126,14 @@ const game = (function tictactoe() {
 					board[0][i] === board[2][i]
 				) {
 					winner = mapToPlayer[board[0][i]];
-					break;
+					return {
+						line: 'v',
+						winningCells: [
+							[0, i],
+							[1, i],
+							[2, i],
+						],
+					};
 				}
 			}
 		}
@@ -132,6 +146,14 @@ const game = (function tictactoe() {
 				board[0][0] === board[2][2]
 			) {
 				winner = mapToPlayer[board[0][0]];
+				return {
+					line: 'dd',
+					winningCells: [
+						[0, 0],
+						[1, 1],
+						[2, 2],
+					],
+				};
 			}
 		}
 
@@ -142,6 +164,14 @@ const game = (function tictactoe() {
 				board[0][2] === board[2][0]
 			) {
 				winner = mapToPlayer[board[0][2]];
+				return {
+					line: 'du',
+					winningCells: [
+						[0, 2],
+						[1, 1],
+						[2, 0],
+					],
+				};
 			}
 		}
 
@@ -162,23 +192,6 @@ const game = (function tictactoe() {
 				winner = tie;
 			}
 		}
-	}
-
-	// TODO: delete this function and move emit logic to replace function call once ui elements added
-	function gameOver(winner) {
-		events.emit('gameOver', winner);
-		switch (winner) {
-			case player1:
-				console.log('Player 1 wins!');
-				break;
-			case player2:
-				console.log('Player 2 wins!');
-				break;
-			case tie:
-				console.log('It was a tie.');
-				break;
-		}
-		console.log("If you'd like to play again, call reset()");
 	}
 
 	/** Returns the symbol for the current player.
@@ -233,11 +246,11 @@ const game = (function tictactoe() {
 		const { row, col } = data;
 		console.log('playround called:', row, col);
 		place(row, col);
-		updateWinner();
+		const winningData = updateWinner();
 		if (noWinner()) {
 			toggleCurrentPlayer();
 		} else {
-			gameOver(winner);
+			events.emit('gameOver', { winner, ...winningData });
 		}
 	}
 	// #endregion
@@ -287,9 +300,8 @@ const displayController = (function displayController() {
 		cell.removeEventListener('click', handleCellClick);
 	}
 
-	function displayWinner(winner) {
-		// TODO: create a ui element in the html and update it here
-		console.log('wooo the winner was:', winner);
+	function displayWinner(data) {
+		const { winner } = data;
 		let winnerText;
 		switch (winner) {
 			case player1:
@@ -307,6 +319,36 @@ const displayController = (function displayController() {
 		dialog.showModal();
 	}
 
+	function drawLines(data) {
+		const { line, winningCells } = data;
+		let classToAdd;
+		switch (line) {
+			case 'h':
+				classToAdd = 'horizontal';
+				break;
+
+			case 'v':
+				classToAdd = 'vertical';
+				break;
+
+			case 'dd':
+				classToAdd = 'diagonal-down';
+				break;
+
+			case 'du':
+				classToAdd = 'diagonal-up';
+				break;
+		}
+
+		if (classToAdd) {
+			winningCells.forEach((loc) => {
+				const [row, col] = loc;
+				const cell = cells[row][col];
+				cell.classList.add('line', classToAdd);
+			});
+		}
+	}
+
 	/** Updates DOM element with string describing current player. */
 	function updatePlayer(currentPlayer) {
 		const playerStrings = ["Player 1's turn: X", "Player 2's turn: O"];
@@ -317,6 +359,13 @@ const displayController = (function displayController() {
 	function resetDisplay() {
 		cellEls.forEach((cell) => {
 			cell.setAttribute('data-piece', '.');
+			cell.classList.remove(
+				'line',
+				'diagonal-up',
+				'diagonal-down',
+				'horizontal',
+				'vertical'
+			);
 		});
 	}
 
@@ -337,6 +386,7 @@ const displayController = (function displayController() {
 	events.on('playerChange', updatePlayer);
 	events.on('gameOver', unbindEvents);
 	events.on('gameOver', displayWinner);
+	events.on('gameOver', drawLines);
 	events.on('gameStart', resetDisplay);
 	events.on('gameStart', bindEvents);
 
