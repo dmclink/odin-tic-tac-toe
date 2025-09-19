@@ -225,6 +225,7 @@ const game = (function tictactoe() {
 		}
 
 		currentPlayer = 0;
+		events.emit('playerChange', currentPlayer);
 		winner = undefined;
 	}
 
@@ -280,8 +281,10 @@ const displayController = (function displayController() {
 	function updateCellData(data) {
 		const { row, col, symbol } = data;
 		console.log('updating cell data:', row, col, symbol);
+		const cell = cells[row][col];
 
-		cells[row][col].setAttribute('data-piece', symbol);
+		cell.setAttribute('data-piece', symbol);
+		cell.removeEventListener('click', handleCellClick);
 	}
 
 	function displayWinner(winner) {
@@ -291,16 +294,14 @@ const displayController = (function displayController() {
 
 	/** Updates DOM element with string describing current player. */
 	function updatePlayer(currentPlayer) {
-		// TODO: update a DOM element with current playerString
-		const playerStrings = ["Player 1: X's", "Player 2: O's"];
-		console.log(playerStrings[currentPlayer]);
+		const playerStrings = ["Player 1's turn: X", "Player 2's turn: O"];
+		document.querySelector('#player-turn').textContent =
+			playerStrings[currentPlayer];
 	}
 
-	function resetDisplay(currentPlayer) {
-		// TODO: reset all ui elements, cells data back to '.', update player turn
+	function resetDisplay() {
 		cellEls.forEach((cell) => {
 			cell.setAttribute('data-piece', '.');
-			updatePlayer(currentPlayer);
 		});
 	}
 
@@ -311,7 +312,6 @@ const displayController = (function displayController() {
 		});
 	}
 
-	// TODO: probably need to rebind events on restart
 	function unbindEvents() {
 		cellEls.forEach((cell) => {
 			cell.removeEventListener('click', handleCellClick);
