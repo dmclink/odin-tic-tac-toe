@@ -1,3 +1,8 @@
+// CONSTANTS
+const player1 = 0;
+const player2 = 1;
+const tie = 2;
+
 // #region events
 const events = (function events() {
 	const e = {};
@@ -33,11 +38,6 @@ const events = (function events() {
 // #region game
 const game = (function tictactoe() {
 	// #region PRIVATE FIELDS
-	// // CONSTANTS
-	const player1 = 0;
-	const player2 = 1;
-	const tie = 2;
-
 	/** playerSymbol is the respective player's game board symbol
 	 * The index represents the player
 	 * ie. index 0 represnts player 1 who has the symbol 'X' */
@@ -290,6 +290,21 @@ const displayController = (function displayController() {
 	function displayWinner(winner) {
 		// TODO: create a ui element in the html and update it here
 		console.log('wooo the winner was:', winner);
+		let winnerText;
+		switch (winner) {
+			case player1:
+				winnerText = 'Player 1 wins!';
+				break;
+			case player2:
+				winnerText = 'Player 2 wins!';
+				break;
+			case tie:
+				winnerText = 'It was a tie.';
+				break;
+		}
+		const dialog = document.querySelector('#dialog');
+		dialog.querySelector('#dialog__winner').textContent = winnerText;
+		dialog.showModal();
 	}
 
 	/** Updates DOM element with string describing current player. */
@@ -335,4 +350,10 @@ document.addEventListener('DOMContentLoaded', () => {
 	document.querySelector('#reset').addEventListener('click', () => {
 		events.emit('gameStart');
 	});
+	document
+		.querySelector('#dialog__play-again')
+		.addEventListener('click', (e) => {
+			events.emit('gameStart');
+			e.target.parentNode.close();
+		});
 });
