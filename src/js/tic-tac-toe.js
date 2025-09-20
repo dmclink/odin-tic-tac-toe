@@ -3,7 +3,7 @@ const player1 = 0;
 const player2 = 1;
 const tie = 2;
 
-// #region events
+// events
 const events = (function events() {
 	const e = {};
 
@@ -33,17 +33,15 @@ const events = (function events() {
 
 	return { on, off, emit };
 })();
-// #endregion
 
-// #region game
-const game = (function tictactoe() {
-	// #region PRIVATE FIELDS
+// game
+(function tictactoe() {
 	/** playerSymbol is the respective player's game board symbol
 	 * The index represents the player
 	 * ie. index 0 represnts player 1 who has the symbol 'X' */
 	const playerSymbol = ['X', 'O'];
 
-	// // STATE
+	// STATE
 	/** board is the 3x3 tic-tac-toe board. Elements can be one of: '.', 'X', 'O' represnting
 	 * an empty slot, player 1 piece, or player 2 piece respectively */
 	const board = new Array(3).fill([]);
@@ -57,9 +55,7 @@ const game = (function tictactoe() {
 	let currentPlayer = 0;
 
 	let winner;
-	// #endregion
 
-	// #region PRIVATE METHODS
 	/** Returns true if row and column locations are out of bounds of board
 	 *
 	 * @param {number} row - row of board to check
@@ -177,7 +173,6 @@ const game = (function tictactoe() {
 
 		// check for tie (all game board slots are filled)
 		if (noWinner()) {
-			console.log('got here:', winner);
 			let isTie = true;
 			outer: for (const row of board) {
 				for (const el of row) {
@@ -200,12 +195,9 @@ const game = (function tictactoe() {
 	function currentPlayerSymbol() {
 		return playerSymbol[currentPlayer];
 	}
-	// #endregion
 
-	// #region PUBLIC METHODS
 	function tryRound(data) {
 		const { row, col } = data;
-		console.log('try round called:', row, col);
 		if (oob(row, col)) {
 			return;
 		}
@@ -213,7 +205,7 @@ const game = (function tictactoe() {
 		if (!empty(row, col)) {
 			return;
 		}
-		console.log('emitting playRound');
+
 		data.symbol = currentPlayerSymbol();
 		events.emit('playRound', data);
 	}
@@ -244,7 +236,6 @@ const game = (function tictactoe() {
 
 	function playRound(data) {
 		const { row, col } = data;
-		console.log('playround called:', row, col);
 		place(row, col);
 		const winningData = updateWinner();
 		if (noWinner()) {
@@ -253,20 +244,15 @@ const game = (function tictactoe() {
 			events.emit('gameOver', { winner, ...winningData });
 		}
 	}
-	// #endregion
 
-	// #region INIT
+	// INIT
 	events.on('tryRound', tryRound);
 	events.on('playRound', playRound);
 	events.on('gameStart', reset);
-
-	// #endregion
-	return { place, reset };
 })();
-// #endergion
 
-// #region displayController
-const displayController = (function displayController() {
+// displayController
+(function displayController() {
 	const board = document.querySelector('.board');
 
 	// build 2d matrix of cached cell element references for quick manipulation via row and col
@@ -282,7 +268,6 @@ const displayController = (function displayController() {
 		return cells;
 	});
 
-	// PRIVATE METHODS
 	function handleCellClick(e) {
 		const cell = e.target;
 		const row = Number(cell.getAttribute('data-row'));
@@ -293,7 +278,6 @@ const displayController = (function displayController() {
 
 	function updateCellData(data) {
 		const { row, col, symbol } = data;
-		console.log('updating cell data:', row, col, symbol);
 		const cell = cells[row][col];
 
 		cell.setAttribute('data-piece', symbol);
@@ -369,7 +353,6 @@ const displayController = (function displayController() {
 		});
 	}
 
-	// PUBLIC METHODS
 	function bindEvents() {
 		cellEls.forEach((cell) => {
 			cell.addEventListener('click', handleCellClick);
@@ -389,10 +372,7 @@ const displayController = (function displayController() {
 	events.on('gameOver', drawLines);
 	events.on('gameStart', resetDisplay);
 	events.on('gameStart', bindEvents);
-
-	return { bindEvents };
 })();
-// #endregion
 
 document.addEventListener('DOMContentLoaded', () => {
 	events.emit('gameStart');
