@@ -11,32 +11,39 @@
 
 <body>
   <header class="header">
-    <h1>Tic-Tac-Toe</h1>
-    <button class="reset" , id="reset">Reset</button>
+    <div class="container">
+      <div></div>
+      <h1 class="header__title">Tic-Tac-Toe</h1>
+      <button class="button header__reset" id="reset">Reset</button>
+    </div>
   </header>
   <main class="main">
-    <p id="player-turn"></p>
-    <div class="board">
-      <div class="col">
-        <button class="cell" data-piece="." data-col="0" data-row="0"></button>
-        <button class="cell" data-piece="." data-col="0" data-row="1"></button>
-        <button class="cell" data-piece="." data-col="0" data-row="2"></button>
-      </div>
-      <div class="col">
-        <button class="cell" data-piece="." data-col="1" data-row="0"></button>
-        <button class="cell" data-piece="." data-col="1" data-row="1"></button>
-        <button class="cell" data-piece="." data-col="1" data-row="2"></button>
-      </div>
-      <div class="col">
-        <button class="cell" data-piece="." data-col="2" data-row="0"></button>
-        <button class="cell" data-piece="." data-col="2" data-row="1"></button>
-        <button class="cell" data-piece="." data-col="2" data-row="2"></button>
+    <p class="player-turn" id="player-turn"></p>
+    <div class="board__wrapper">
+      <div class="board">
+        <div class="col">
+          <button class="cell" data-piece="." data-col="0" data-row="0"></button>
+          <button class="cell" data-piece="." data-col="0" data-row="1"></button>
+          <button class="cell" data-piece="." data-col="0" data-row="2"></button>
+        </div>
+        <div class="col">
+          <button class="cell" data-piece="." data-col="1" data-row="0"></button>
+          <button class="cell" data-piece="." data-col="1" data-row="1"></button>
+          <button class="cell" data-piece="." data-col="1" data-row="2"></button>
+        </div>
+        <div class="col">
+          <button class="cell" data-piece="." data-col="2" data-row="0"></button>
+          <button class="cell" data-piece="." data-col="2" data-row="1"></button>
+          <button class="cell" data-piece="." data-col="2" data-row="2"></button>
+        </div>
       </div>
     </div>
     <dialog class="dialog" id="dialog">
-      <p class="dialog__winner" id="dialog__winner"></p>
-      <p>Would you like to play again?</p>
-      <button class="dialog__play-again" id="dialog__play-again">Play Again</button>
+      <div class="dialog__wrapper">
+        <p class="dialog__winner" id="dialog__winner"></p>
+        <p>Would you like to play again?</p>
+        <button class="button dialog__play-again" id="dialog__play-again">Play Again</button>
+      </div>
     </dialog>
   </main>
 </body>

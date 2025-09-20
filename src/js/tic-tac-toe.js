@@ -404,6 +404,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		.querySelector('#dialog__play-again')
 		.addEventListener('click', (e) => {
 			events.emit('gameStart');
-			e.target.parentNode.close();
+			e.target.parentNode.parentNode.close();
 		});
 });
